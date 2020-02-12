@@ -23,6 +23,7 @@ int left();//Function to direct the snake to left and checking whether we lose t
 int up();//Function to direct the snake to upwards and checking whether we lose the game or note while moving this way
 int down();//Function to direct the snake to downwards and checking whether we lose the game or note while moving this way
 void out();//Function to check the condition of being out if head touching the console(Boundaries) or himself
+void pause();//Function to pause the game
 void push_file(int,int,int);//Function to create a linked list carrying information of previous game data
 void body_dir(int,int);//Function to modify the information of co-ordinate of snake when moved
 struct node//Structure Data Type to store the information of each pixel of snake in linked list
@@ -259,6 +260,7 @@ void push_file(int x,int y,int z)//Function to make linked list of file informat
 }
 void snake_begin()//Function to start Snake Game
 {
+    int flag_=3;//New variable is used to modify the direction value with previous direction value after pausing and replaying it
     while(1)//Loop to printing different frames of pixels(Strings) with updated position of snake making it look moving
     {
         system("cls");//Clearing screen to print new frame
@@ -301,6 +303,12 @@ void snake_begin()//Function to start Snake Game
             if(down())
                 break;
         }
+        else if(dir==-1)//Pausing the game
+        {
+            pause();
+            dir=flag_;
+        }
+        flag_=dir;//Previous direction is stored
     }
 }
 void score_food()//Function to update score and generating random co-ordinate of food
@@ -331,6 +339,7 @@ int Randoms(int lower,int upper)
 }
 void display_game()//Function to display console and score
 {
+    printf("PRESS ' '(Space Bar) TO PAUSE THE GAME\n");
     for(i=0;i<20;i++)
     {
         if(i>1)
@@ -367,6 +376,8 @@ int di_r(int dir)//Funtion to return direction according to relative position of
             return 5;
         else return dir;
     }
+    else if(ch1==32)//This is value is for pausing the game
+            return -1;
     else
         return dir;
 }
@@ -537,6 +548,50 @@ void out()
             p=p->next;
         }
         fclose(pt1);
+    }
+}
+void pause()//Pause function
+{
+    char con_[20][51];//New console is created
+    for(i=0;i<20;i++)
+    {
+        for(j=0;j<50;j++)
+        {
+            con_[i][j]='#';
+            if((i>0)&&(i<19))
+                if((j>0)&&(j<49))
+                    con_[i][j]=' ';
+            if((i>2)&&(i<18))//Condition for creation pause symbol on console
+            {
+                if(j==19)
+                    con_[i][j]='*';
+                if((i>2)&&(i<11))
+                {
+                    if(j==2*i+13)
+                        con_[i][j]='*';
+                }
+                if((i>10)&&(i<18))
+                {
+                    if(j==53-2*i)
+                        con_[i][j]='*';
+                }
+            }
+        }
+        con_[i][50]='\0';
+    }
+    system("cls");
+    for(i=0;i<20;i++)
+        printf("%s\n",&con_[i][0]);
+    printf("GAME IS PAUSED PRESS ' '(Space Bar) TO PLAY THE GAME");
+    int ch=0;
+    while(1)//Loop for checking ' '(Space Bar) is typed or not
+    {
+        if(kbhit())
+            ch=di_r(ch);
+        if(ch==-1)
+            break;
+        else
+            ch=0;
     }
 }
 void body_dir(int i,int j)//Function to update the co-ordinates of the body
