@@ -5,6 +5,7 @@
 int i,j,dir,x,y,flag,restart,score,n,num_file,score_temp,g,level,file_flag;//All variables used in program
 FILE *pt,*pt1;//Variables for file handling
 char con[20][51];//Strings to represent the game when printed in 2-D considering each block as pixel
+int search[20][50]={0};//Array for making search
 void initial();//Function to giving initial required values to all the variables
 void display();//Function to display intro
 void console_creator();//Function to create the border and space for snake to move
@@ -103,6 +104,7 @@ void snake_body_initial()//Creating initial snake of 4 pixel size
     {
         con[8][22+i]='*';
         push(8,22+i);
+        search[8][22+i]=1;
     }
     con[8][25]='>';//Head of snake
     push(8,25);
@@ -124,6 +126,7 @@ void push(int i,int j)//Function to create linked list with co-ordinates of snak
         head=temp;
         head->next=NULL;
     }
+    search[i][j]=1;
 }
 void start_game()//Starting game in different mode "NEW GAME OR PREVIOUS ONE"
 {
@@ -388,6 +391,11 @@ int right()//Function for the relative motion of snake and updating position of 
         out();//Calling out function
         return 1;//Returning 1 from function so that loop in snake_begin function is broken
     }
+    if(search[head->data[0]][head->data[1]+1])//Checking whether snake have bitten itself or not by hash mapping technique
+    {
+        out();
+        return 1;
+    }
     if((head->data[0]==y)&&(head->data[1]+1==x))//Condition for checking whether food is eaten or not
     {
         flag=1;//updating flag variable if food is eaten to update score and food position
@@ -403,22 +411,16 @@ int right()//Function for the relative motion of snake and updating position of 
         body_dir(head->data[0],head->data[1]+1);//Updating the position of snake
         con[head->data[0]][head->data[1]]='>';
     }
-    struct node *p=tail;
-    while(p->next)//Condition to check if after updating the position of snake whether snake have bitten itself or not
-    {
-        if((p->data[0]==head->data[0])&&(p->data[1]==head->data[1]))//If new position hit snake itself Game Over
-        {
-            out();
-            return 1;
-        }
-        else
-            p=p->next;
-    }
     return 0;
 }
 int left()
 {
     if(head->data[1]==1)
+    {
+        out();
+        return 1;
+    }
+    if(search[head->data[0]][head->data[1]-1])
     {
         out();
         return 1;
@@ -438,22 +440,16 @@ int left()
         body_dir(head->data[0],head->data[1]-1);
         con[head->data[0]][head->data[1]]='<';
     }
-    struct node *p=tail;
-    while(p->next)
-    {
-        if((p->data[0]==head->data[0])&&(p->data[1]==head->data[1]))
-        {
-            out();
-            return 1;
-        }
-        else
-            p=p->next;
-    }
     return 0;
 }
 int up()
 {
     if(head->data[0]==1)
+    {
+        out();
+        return 1;
+    }
+    if(search[head->data[0]-1][head->data[1]])
     {
         out();
         return 1;
@@ -473,22 +469,16 @@ int up()
         body_dir(head->data[0]-1,head->data[1]);
         con[head->data[0]][head->data[1]]='^';
     }
-    struct node *p=tail;
-    while(p->next)
-    {
-        if((p->data[0]==head->data[0])&&(p->data[1]==head->data[1]))
-        {
-            out();
-            return 1;
-        }
-        else
-            p=p->next;
-    }
     return 0;
 }
 int down()
 {
     if(head->data[0]==18)
+    {
+        out();
+        return 1;
+    }
+    if(search[head->data[0]+1][head->data[1]])
     {
         out();
         return 1;
@@ -507,17 +497,6 @@ int down()
         con[head->data[0]][head->data[1]]='*';
         body_dir(head->data[0]+1,head->data[1]);
         con[head->data[0]][head->data[1]]='v';
-    }
-    struct node *p=tail;
-    while(p->next)
-    {
-        if((p->data[0]==head->data[0])&&(p->data[1]==head->data[1]))
-        {
-            out();
-            return 1;
-        }
-        else
-            p=p->next;
     }
     return 0;
 }
@@ -605,6 +584,7 @@ void body_dir(int i,int j)//Function to update the co-ordinates of the body
 {
     struct node *temp=tail;
     tail=tail->next;
+    search[temp->data[0]][temp->data[1]]=0;
     free(temp);
     temp=(struct node *)malloc(sizeof(struct node));
     temp->data[0]=i;
@@ -612,4 +592,5 @@ void body_dir(int i,int j)//Function to update the co-ordinates of the body
     head->next=temp;
     head=head->next;
     head->next=NULL;
+    search[head->data[0]][head->data[1]]=1;
 }
