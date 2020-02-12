@@ -581,7 +581,14 @@ void pause()//Pause function
     }
     system("cls");
     for(i=0;i<20;i++)
-        printf("%s\n",&con_[i][0]);
+    {
+        if(i>1)
+            printf("%s\n",&con_[i][0]);//Printing the console
+        else if(i==0)
+            printf("%s  SCORE : %d\n",&con_[i][0],score);//If its the first line of string then printing score
+        else
+            printf("%s  Previous high score %d\n",&con_[i][0],score_temp);//For second line showing previous high score
+    }
     printf("GAME IS PAUSED PRESS ' '(Space Bar) TO PLAY THE GAME");
     int ch=0;
     while(1)//Loop for checking ' '(Space Bar) is typed or not
